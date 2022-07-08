@@ -44,6 +44,7 @@ static RNWatch *sharedInstance;
 @implementation RNWatch {
   BOOL hasObservers;
   NSMutableArray<NSDictionary *> *pendingEvents;
+  NSURL *filesUrl;
 }
 
 RCT_EXPORT_MODULE()
@@ -68,6 +69,12 @@ RCT_EXPORT_MODULE()
  
     hasObservers = NO;
     pendingEvents = [NSMutableArray array];
+
+    NSString *documentDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES) objectAtIndex:0];
+    NSURL *homeURL = [NSURL fileURLWithPath:documentDirectory isDirectory:YES];
+    filesUrl = [homeURL URLByAppendingPathComponent:@"files"];
+    NSError *error;
+    [[NSFileManager defaultManager] createDirectoryAtPath:filesUrl.path withIntermediateDirectories:true attributes:nil error:&error];
 
     if ([WCSession isSupported]) {
         WCSession *session = [WCSession defaultSession];
@@ -389,7 +396,9 @@ RCT_EXPORT_METHOD(getFileTransfers:
 
 - (void)session:(WCSession *)session
  didReceiveFile:(WCSessionFile *)file {
-    // TODO
+    NSError *error;
+    NSURL *toURL = [NSURL URLWithString:file.fileURL.lastPathComponent relativeToURL:filesUrl];
+    [[NSFileManager defaultManager] moveItemAtURL:file.fileURL toURL:toURL error:&error];
 }
 
 - (void)      session:(WCSession *)session

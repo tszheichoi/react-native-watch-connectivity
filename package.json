@@ -34,6 +34,7 @@
   ],
   "homepage": "http://mtford.co.uk/react-native-watch-connectivity/",
   "scripts": {
+    "prepare": "yarn run build",
     "build": "rm -rf dist && yarn tsc && cp ./lib/RNWatch.d.ts ./dist/RNWatch.d.ts && yarn lint ./dist/**/*.d.ts ./dist/**/*.js --fix --quiet",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx",
     "precommit": "tsc --skipLibCheck && lint-staged"
